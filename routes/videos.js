@@ -80,23 +80,40 @@ router.post('/video/:videoId/comments', (req, res) => {
       console.error('Error reading data from file', err);
       return res.status(500).json({ error: 'Error reading file' });
     }
-    if (req.body.id) {
-      try {
-        const addComments = JSON.parse(data);
-        const newComment = {
-          id: uuidv4(),
-          name: req.body.name,
-          comment: req.body.comment,
-          likes: 0,
-          timestamp: Date.now(),
-        };
-        addComments.push(newComment);
-        fs.writeFileSync('./data/videos.json', JSON.stringify(addComments));
-        res.status(201).send('you have created a new video!');
-      } catch (err) {
-        console.error('Error adding comment', err);
-        res.status(500).json({ error: 'Error adding comments' });
+    try {
+      const videoId = req.params.videoId;
+      const videos = JSON.parse(data);
+      const video = videos.find((v) => v.id === videoId);
+
+      if (!video) {
+        return res.status(404).json({ error: 'Video not found' });
       }
+
+      const newComment = {
+        id: uuidv4(),
+        name: req.body.name,
+        comment: req.body.comment,
+        likes: 0,
+        timestamp: Date.now(),
+      };
+
+      video.comments.push(newComment);
+
+      fs.writeFile(
+        'data/videos.json',
+        JSON.stringify(videos, null, 2),
+        (err) => {
+          if (err) {
+            console.error('Error writing file', err);
+            return res.status(500).json({ error: 'Error saving comment' });
+          }
+
+          res.status(201).json(newComment);
+        }
+      );
+    } catch (err) {
+      console.error('Error processing data', err);
+      res.status(500).json({ error: 'Error adding comment' });
     }
   });
 });
