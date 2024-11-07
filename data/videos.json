@@ -292,5 +292,26 @@
         "timestamp": 1701584262000
       }
     ]
+  },
+  {
+    "id": "4d95eb60-0c8a-43b1-8360-f1e5677ca9de",
+    "title": "Video that I first made in my life",
+    "channel": "Jenny Kim",
+    "image": "https://unit-3-project-api-0a5620414506.herokuapp.com/images/image8.jpg",
+    "description": "This is the first video I've ever created, capturing the beginning of my journey in video production. It's a simple yet meaningful project that marks the start of my creative exploration.",
+    "views": "0",
+    "likes": "0",
+    "duration": "10:00",
+    "video": "https://unit-3-project-api-0a5620414506.herokuapp.com/stream",
+    "timestamp": 1730850556939,
+    "comments": [
+      {
+        "id": "d3e7dc13-8ba5-4776-a341-6e0840aec119",
+        "name": "Jenny Kim",
+        "comment": "Hello!",
+        "likes": 0,
+        "timestamp": 1730947889440
+      }
+    ]
   }
 ]
