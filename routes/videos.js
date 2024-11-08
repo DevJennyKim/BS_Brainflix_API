@@ -52,7 +52,7 @@ router.get('/videos/:videoId', (req, res) => {
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, '../public/images'));
+    cb(null, path.join(__dirname, '../../haeun-kim-brainflix/public/images'));
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
@@ -68,13 +68,12 @@ router.post('/videos/uploadImg', upload.single('file'), function (req, res) {
 });
 
 router.post('/videos', (req, res) => {
-  console.log(req.body);
   fs.readFile('data/videos.json', 'utf-8', (err, data) => {
     if (err) {
       console.error('Error reading data from file', err);
       return res.status(500).json({ error: 'Error reading file' });
     }
-    console.log(req.body);
+
     try {
       const parsedVideos = JSON.parse(data);
       const imgName = req.body.image.replace(/\s+/g, '');
@@ -82,16 +81,14 @@ router.post('/videos', (req, res) => {
         id: uuidv4(),
         title: req.body.title,
         channel: 'Jenny Kim',
-        image: req.body.image
-          ? '../public/images/' + imgName.replace(/\s+/g, '')
-          : 'https://unit-3-project-api-0a5620414506.herokuapp.com/images/image8.jpg',
+        image: '../public/images/' + imgName,
         description: req.body.description,
         views: '0',
         likes: '0',
         duration: '10:00',
         video: 'https://unit-3-project-api-0a5620414506.herokuapp.com/stream',
         timestamp: Date.now(),
-        comment: [],
+        comments: [],
       };
       parsedVideos.push(newVideo);
 
