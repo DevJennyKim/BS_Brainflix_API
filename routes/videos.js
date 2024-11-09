@@ -88,6 +88,7 @@ router.put('/videos/:videoId/likes', (req, res) => {
     }
   });
 });
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, path.join(__dirname, '../public/images'));
@@ -120,7 +121,6 @@ router.post('/videos', (req, res) => {
       const parsedVideos = JSON.parse(data);
       console.log(req.body);
       const imgName = req.body.image.replace(/\s+/g, '');
-
       const newVideo = {
         id: uuidv4(),
         title: req.body.title,
