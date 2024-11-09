@@ -67,7 +67,9 @@ router.put('/videos/:videoId/likes', (req, res) => {
       if (!video) {
         return res.status(404).json({ error: 'Video not found' });
       }
-      video.likes = (parseInt(video.likes.replace(/,/g, '')) + 1).toString();
+      video.likes = (
+        parseInt(video.likes.replace(/,/g, '')) + 1
+      ).toLocaleString();
 
       fs.writeFile(
         'data/videos.json',
