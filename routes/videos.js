@@ -5,10 +5,11 @@ import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { log } from 'console';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
+const IMG_URL = process.env.IMG_URL || 'http://localhost:8090/images/';
 const router = express.Router();
 
 router.get('/videos', (req, res) => {
@@ -50,9 +51,47 @@ router.get('/videos/:videoId', (req, res) => {
   });
 });
 
+router.put('/videos/:videoId/likes', (req, res) => {
+  fs.readFile('data/videos.json', 'utf-8', (err, data) => {
+    if (err) {
+      console.error('Error reading data from file', err);
+      return res.status(500).json({
+        error: 'Error reading file',
+      });
+    }
+    try {
+      const videoId = req.params.videoId;
+      const videos = JSON.parse(data);
+      const video = videos.find((v) => v.id === videoId);
+
+      if (!video) {
+        return res.status(404).json({ error: 'Video not found' });
+      }
+      video.likes = (
+        parseInt(video.likes.replace(/,/g, '')) + 1
+      ).toLocaleString();
+
+      fs.writeFile(
+        'data/videos.json',
+        JSON.stringify(videos, null, 2),
+        (err) => {
+          if (err) {
+            console.error('Error writing file', err);
+            return res.status(500).json({ error: 'Error saving comment' });
+          }
+          res.json(video.likes);
+        }
+      );
+    } catch (error) {
+      console.error('Error', error);
+      res.status(500).json({ error: 'Error' });
+    }
+  });
+});
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, '../../haeun-kim-brainflix/public/images'));
+    cb(null, path.join(__dirname, '../public/images'));
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
@@ -63,8 +102,13 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 router.post('/videos/uploadImg', upload.single('file'), function (req, res) {
-  const file = req.file;
-  res.status(200).json(file.filename);
+  try {
+    const file = req.file;
+    res.status(200).json(file.filename);
+  } catch (error) {
+    console.error('Error parsing image', parseError);
+    res.status(500).json({ error: 'Error parsing image' });
+  }
 });
 
 router.post('/videos', (req, res) => {
@@ -73,15 +117,17 @@ router.post('/videos', (req, res) => {
       console.error('Error reading data from file', err);
       return res.status(500).json({ error: 'Error reading file' });
     }
-
     try {
       const parsedVideos = JSON.parse(data);
+      console.log(req.body);
       const imgName = req.body.image.replace(/\s+/g, '');
       const newVideo = {
         id: uuidv4(),
         title: req.body.title,
         channel: 'Jenny Kim',
-        image: '../public/images/' + imgName,
+        image: req.body.image
+          ? IMG_URL + imgName
+          : IMG_URL + 'Upload-video-preview.jpg',
         description: req.body.description,
         views: '0',
         likes: '0',
