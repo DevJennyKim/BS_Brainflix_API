@@ -5,6 +5,7 @@ import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { log } from 'console';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -59,17 +60,14 @@ router.put('/videos/:videoId/likes', (req, res) => {
       });
     }
     try {
-      console.log(jsonData);
-      console.log(req.params.videoId);
+      const videoId = req.params.videoId;
+      const videos = JSON.parse(data);
+      const video = videos.find((v) => v.id === videoId);
 
-      const foundData = jsonData.find(
-        (video) => video.id === req.params.videoId
-      );
-      const jsonData = JSON.parse(foundData);
-      if (!foundData) {
+      if (!video) {
         return res.status(404).json({ error: 'Video not found' });
       }
-      foundData.likes = (parseInt(foundData.likes) + 1).toString();
+      video.likes = (parseInt(video.likes.replace(/,/g, '')) + 1).toString();
 
       fs.writeFile(
         'data/videos.json',
@@ -79,7 +77,7 @@ router.put('/videos/:videoId/likes', (req, res) => {
             console.error('Error writing file', err);
             return res.status(500).json({ error: 'Error saving comment' });
           }
-          res.json(foundData);
+          res.json(video.likes);
         }
       );
     } catch (error) {
