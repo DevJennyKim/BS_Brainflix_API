@@ -1,0 +1,7 @@
+service: -type:web
+  name:Backend
+  env:node
+  plan:free
+  buildCommand:npm install
+  startCommand:npm start
+  region:Calgary

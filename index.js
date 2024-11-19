@@ -8,6 +8,10 @@ app.use(express.json());
 app.use(cors());
 app.use(express.static('public'));
 
+app.get('/healthz', (req, res) => {
+  res.status(200).send('OK');
+});
+
 app.get('/', (req, res) => {
   res.send('Welcome to the API. Please check the API document!');
 });
